@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Call – Home</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 420px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 8px; }
+    .subtitle { color: #aaa; margin-bottom: 32px; font-size: .95rem; }
+    input, button {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      margin-bottom: 14px;
+    }
+    input {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      outline: none;
+    }
+    input::placeholder { color: #999; }
+    .btn-primary {
+      background: #6c63ff;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background .2s;
+    }
+    .btn-primary:hover { background: #5a52e0; }
+    .btn-secondary {
+      background: transparent;
+      color: #6c63ff;
+      border: 2px solid #6c63ff;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background .2s;
+    }
+    .btn-secondary:hover { background: rgba(108,99,255,.15); }
+    .divider { color: #666; margin: 18px 0; font-size: .85rem; }
+    #status { color: #ff6b6b; margin-top: 8px; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Video Call</h1>
+    <p class="subtitle">Create a room or join an existing one</p>
+
+    <input id="nameInput" type="text" placeholder="Your Name" value="" required />
+
+    <!-- Create new meeting -->
+    <button class="btn-primary" id="createBtn">Create New Meeting</button>
+
+    <p class="divider">— OR join an existing meeting —</p>
+
+    <!-- Join existing -->
+    <input id="meetingIdInput" type="text" placeholder="Enter Meeting ID (e.g. xxxx-xxxx-xxxx)" />
+    <button class="btn-secondary" id="joinBtn">Join Meeting</button>
+
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const status = document.getElementById("status");
+
+    document.getElementById("createBtn").addEventListener("click", async () => {
+      const name = document.getElementById("nameInput").value.trim() || "Guest";
+      status.textContent = "Creating room...";
+      try {
+        const res = await fetch("/create-meeting", { method: "POST" });
+        const data = await res.json();
+        window.location.href = `/join?meetingId=${data.meetingId}&name=${encodeURIComponent(name)}`;
+      } catch (e) {
+        status.textContent = "Failed to create meeting: " + e.message;
+      }
+    });
+
+    document.getElementById("joinBtn").addEventListener("click", () => {
+      const name = document.getElementById("nameInput").value.trim() || "Guest";
+      const meetingId = document.getElementById("meetingIdInput").value.trim();
+      if (!meetingId) { status.textContent = "Please enter a Meeting ID."; return; }
+      window.location.href = `/join?meetingId=${meetingId}&name=${encodeURIComponent(name)}`;
+    });
+  </script>
+</body>
+</html>
