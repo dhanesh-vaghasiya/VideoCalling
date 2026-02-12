@@ -1,0 +1,431 @@
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+   
+ .meeting-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.video-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.video-tile video {
+  width: 400px;
+  border-radius: 12px;
+}
+
+ body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1419;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ────────────────────────────── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(15, 20, 25, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-small {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .meeting-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meeting-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #a0aec0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .meeting-info:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .meeting-id {
+      color: #667eea;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+    }
+
+    #copyMsg {
+      color: #48bb78;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      background: rgba(72, 187, 120, 0.1);
+      border-radius: 4px;
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .participants-count {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(102, 126, 234, 0.15);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    /* ── Share banner ──────────────────────── */
+    .share-banner {
+      background: linear-gradient(90deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+      border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+      padding: 12px 24px;
+      text-align: center;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .share-banner span {
+      color: #a0aec0;
+    }
+
+    .share-link {
+      color: #667eea;
+      word-break: break-all;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .share-link:hover {
+      color: #764ba2;
+    }
+
+    .copy-link-btn {
+      background: rgba(102, 126, 234, 0.2);
+      color: #667eea;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .copy-link-btn:hover {
+      background: rgba(102, 126, 234, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* ── Video grid ────────────────────────── */
+    .video-grid {
+      flex: 1;
+      display: grid;
+      gap: 16px;
+      padding: 24px;
+      overflow-y: auto;
+      align-content: center;
+      justify-content: center;
+    }
+
+    /* Auto grid layout based on participant count */
+    .video-grid[data-count="1"] { grid-template-columns: 1fr; max-width: 1200px; margin: 0 auto; }
+    .video-grid[data-count="2"] { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); max-width: 1400px; margin: 0 auto; }
+    .video-grid[data-count="3"],
+    .video-grid[data-count="4"] { grid-template-columns: repeat(2, 1fr); max-width: 1400px; margin: 0 auto; }
+    .video-grid[data-count="5"],
+    .video-grid[data-count="6"] { grid-template-columns: repeat(3, 1fr); max-width: 1800px; margin: 0 auto; }
+    .video-grid[data-count]:nth-child(n+7) { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+
+    .video-tile {
+      position: relative;
+      background: linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .video-tile:hover {
+      border-color: rgba(102, 126, 234, 0.3);
+      transform: scale(1.02);
+    }
+
+    .video-tile.speaking {
+      border-color: #48bb78;
+      box-shadow: 0 8px 32px rgba(72, 187, 120, 0.3);
+    }
+
+    .video-tile video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-tile .label {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .video-tile .label .status-icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #48bb78;
+    }
+
+    .video-tile .label.muted .status-icon {
+      background: #e53e3e;
+    }
+
+    .video-tile .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+      text-transform: uppercase;
+    }
+
+    .video-tile .connection-quality {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── Controls bar ──────────────────────── */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 20px 24px;
+      background: rgba(15, 20, 25, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .ctrl-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #fff;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .ctrl-btn::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: inherit;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: scale(1.3);
+    }
+
+    .ctrl-btn:hover::before {
+      opacity: 0.3;
+    }
+
+    .ctrl-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .ctrl-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .ctrl-btn.on {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .ctrl-btn.off {
+      background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+    }
+
+    .ctrl-btn.leave {
+      background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+      width: auto;
+      padding: 0 24px;
+      border-radius: 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+    }
+
+    .ctrl-btn.leave:hover {
+      background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+      box-shadow: 0 6px 20px rgba(229, 62, 62, 0.5);
+    }
+
+    .ctrl-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* More options menu */
+    .more-btn {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Tooltip */
+    .ctrl-btn[title]:hover::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 100%;
+      margin-bottom: 8px;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      color: #a0aec0;
+      font-size: 1.2rem;
+      padding: 40px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .topbar {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+
+      .share-banner {
+        padding: 10px 16px;
+        font-size: 0.8rem;
+      }
+
+      .video-grid {
+        padding: 16px;
+        gap: 12px;
+        grid-template-columns: 1fr !important;
+      }
+
+      .controls {
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .ctrl-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
+      }
+
+      .ctrl-btn.leave {
+        padding: 0 20px;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Loading animation */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
