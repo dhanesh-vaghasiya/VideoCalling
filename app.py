@@ -8,6 +8,7 @@ Flask server that:
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import requests
+from flask_cors import CORS
 import jwt
 import datetime
 from dotenv import load_dotenv
@@ -15,6 +16,9 @@ import os
 
 app = Flask(__name__)
 load_dotenv()
+
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 # ──────────────────── CONFIG ────────────────────
 VIDEOSDK_API_KEY = os.getenv('VIDEOSDK_API_KEY')
 VIDEOSDK_SECRET_KEY = os.getenv('VIDEOSDK_SECRET_KEY')
@@ -41,8 +45,6 @@ def generate_token():
         "exp": int(exp.timestamp()),
     }
     # db.create_all()
-
-
     return jwt.encode(payload, VIDEOSDK_SECRET_KEY, algorithm="HS256")
 
 VIDEOSDK_TOKEN = generate_token()

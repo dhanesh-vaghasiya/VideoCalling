@@ -1,0 +1,268 @@
+/* ═══════════════════════════════════════════════════════
+   Profile page – Nova Hospital teal theme
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Profile card ── */
+.prof-card {
+  background: #fff;
+  border: 1px solid #D5DEE5;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.prof-card-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 32px 24px;
+}
+
+.prof-avatar-lg {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5B8FA8, #3E7289);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.prof-identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.prof-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1A2D3D;
+  margin: 0 0 6px;
+}
+
+.prof-role-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #E8F3F7;
+  color: #5B8FA8;
+  margin-bottom: 6px;
+}
+
+.prof-email {
+  font-size: 0.875rem;
+  color: #7A92A5;
+  margin: 0;
+}
+
+.prof-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+/* ── Mini stats row ── */
+.prof-mini-stats {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #E8EFF3;
+  padding: 0 32px;
+}
+
+.prof-mini-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.prof-mini-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1A2D3D;
+}
+
+.prof-mini-label {
+  font-size: 0.75rem;
+  color: #7A92A5;
+  margin-top: 2px;
+}
+
+.prof-mini-divider {
+  width: 1px;
+  height: 36px;
+  background: #E8EFF3;
+}
+
+/* ── Details card ── */
+.prof-details {
+  background: #fff;
+  border: 1px solid #D5DEE5;
+  border-radius: 12px;
+  padding: 28px 32px;
+}
+
+.prof-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1A2D3D;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #E8EFF3;
+}
+
+.prof-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+}
+
+.prof-field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #7A92A5;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.prof-field p {
+  font-size: 0.925rem;
+  color: #1A2D3D;
+  margin: 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prof-field input,
+.prof-field select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #D5DEE5;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1A2D3D;
+  background: #F8FAFB;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.prof-field input:focus,
+.prof-field select:focus {
+  outline: none;
+  border-color: #5B8FA8;
+  box-shadow: 0 0 0 3px rgba(91, 143, 168, 0.1);
+  background: #fff;
+}
+
+.prof-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #E8EFF3;
+}
+
+/* Account status dot */
+.prof-status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7A92A5;
+}
+
+.prof-status-dot.active {
+  background: #2E9E6B;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .prof-card-top {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px 20px;
+  }
+
+  .prof-edit-btn {
+    align-self: center;
+  }
+
+  .prof-mini-stats {
+    padding: 0 16px;
+  }
+
+  .prof-mini-stat {
+    padding: 14px 0;
+  }
+
+  .prof-mini-val {
+    font-size: 1rem;
+  }
+
+  .prof-details {
+    padding: 20px;
+  }
+
+  .prof-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .prof-name {
+    font-size: 1.15rem;
+  }
+
+  .prof-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .prof-actions .dash-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .prof-card-top {
+    padding: 20px 16px;
+  }
+
+  .prof-avatar-lg {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+  }
+
+  .prof-mini-stats {
+    padding: 0 12px;
+    flex-wrap: wrap;
+  }
+
+  .prof-mini-stat {
+    min-width: 60px;
+  }
+
+  .prof-details {
+    padding: 16px;
+  }
+
+  .prof-section-title {
+    font-size: 0.92rem;
+  }
+}

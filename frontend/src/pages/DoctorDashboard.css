@@ -1,0 +1,419 @@
+/* DoctorDashboard.css */
+
+/* --- LAYOUT & GLOBAL --- */
+.doctor-dashboard-layout {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f4f8;
+    min-height: 100vh;
+    padding: 2rem;
+    color: #333;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* --- HEADER --- */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.header-left h1 {
+    font-size: 1.8rem;
+    color: #2F4F4F;
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #666;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.icon-btn {
+    background: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    font-size: 1.2rem;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+    transform: translateY(-2px);
+}
+
+.badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff6b6b;
+    color: white;
+    font-size: 0.7rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #5F9EA0, #40E0D0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(95, 158, 160, 0.3);
+}
+
+/* --- STATS CARDS --- */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+.stat-card.blue .stat-icon {
+    background: #e3f2fd;
+    color: #1e88e5;
+}
+
+.stat-card.teal .stat-icon {
+    background: #e0f2f1;
+    color: #00897b;
+}
+
+.stat-card.orange .stat-icon {
+    background: #fff3e0;
+    color: #fb8c00;
+}
+
+.stat-card.green .stat-icon {
+    background: #e8f5e9;
+    color: #43a047;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #2F4F4F;
+}
+
+.stat-info p {
+    margin: 0;
+    color: #888;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* --- MAIN GRID --- */
+.main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
+    margin-bottom: 2rem;
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.dashboard-card h3 {
+    margin: 0;
+    color: #2F4F4F;
+    font-size: 1.2rem;
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    color: #5F9EA0;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* --- SCHEDULE LIST --- */
+.schedule-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.time-col {
+    width: 100px;
+    font-weight: 600;
+    color: #5F9EA0;
+}
+
+.info-col {
+    flex: 1;
+}
+
+.info-col h4 {
+    margin: 0 0 0.2rem 0;
+    color: #333;
+}
+
+.info-col p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.start-btn {
+    padding: 0.5rem 1.2rem;
+    background: #e0f2f1;
+    color: #00897b;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.start-btn:hover {
+    background: #00897b;
+    color: white;
+}
+
+/* --- REQUESTS TABLE --- */
+.filters {
+    display: flex;
+    gap: 1rem;
+}
+
+.filters input,
+.filters select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    font-family: inherit;
+    outline: none;
+}
+
+.filters input:focus {
+    border-color: #5F9EA0;
+}
+
+.requests-table-container {
+    overflow-x: auto;
+}
+
+.requests-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.requests-table th {
+    text-align: left;
+    padding: 1rem;
+    color: #888;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.requests-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+.pat-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-weight: 600;
+}
+
+.pat-avatar {
+    width: 32px;
+    height: 32px;
+    background: #e0e0e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #555;
+    font-weight: bold;
+}
+
+.date-time {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-time small {
+    color: #888;
+}
+
+.status-pill {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.pill-pending {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.pill-scheduled {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.pill-completed {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.view-details-btn {
+    background: #5F9EA0;
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+/* --- HISTORY & CALENDAR --- */
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.hist-icon {
+    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hist-info {
+    flex: 1;
+}
+
+.hist-info h4 {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.hist-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.hist-date {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+/* Mock Calendar - Visual Only */
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 1rem;
+}
+
+.cal-day {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.cal-day:hover {
+    background: #f0f4f8;
+}
+
+.cal-day.today {
+    background: #5F9EA0;
+    color: white;
+}
+
+.cal-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+}

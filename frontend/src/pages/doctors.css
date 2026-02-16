@@ -1,0 +1,368 @@
+/* ═══════════════════════════════════════════════════════
+   Doctors Page – Nova Hospital teal theme
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Page header ── */
+.doc-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.doc-page-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1A2D3D;
+  margin: 0 0 6px;
+  letter-spacing: -0.4px;
+}
+
+.doc-page-subtitle {
+  font-size: 0.9rem;
+  color: #7A92A5;
+  margin: 0;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.doc-header-stats {
+  display: flex;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.doc-header-stat {
+  text-align: center;
+}
+
+.doc-header-stat-val {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #3E7289;
+}
+
+.doc-header-stat-label {
+  font-size: 0.75rem;
+  color: #7A92A5;
+  font-weight: 500;
+}
+
+/* ── Department filter chips ── */
+.doc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.doc-filter-chip {
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 1.5px solid #D5DEE5;
+  background: #fff;
+  color: #5A7282;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.doc-filter-chip:hover {
+  border-color: #A8D0DE;
+  background: #F0F7FA;
+  color: #3E7289;
+}
+
+.doc-filter-chip.active {
+  background: linear-gradient(135deg, #5B8FA8, #3E7289);
+  color: #fff;
+  border-color: #3E7289;
+  font-weight: 600;
+}
+
+/* ── Doctor cards grid ── */
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.doc-card {
+  background: #fff;
+  border: 1px solid #D5DEE5;
+  border-radius: 16px;
+  padding: 28px 24px 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.doc-card:hover {
+  box-shadow: 0 8px 28px rgba(91, 143, 168, 0.1);
+  transform: translateY(-2px);
+}
+
+.doc-card.unavailable {
+  opacity: 0.65;
+}
+
+/* ── Availability badge ── */
+.doc-avail-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.doc-avail-badge.online {
+  background: #E8F7EE;
+  color: #2E9E6B;
+}
+
+.doc-avail-badge.offline {
+  background: #FEF2F2;
+  color: #D14E4E;
+}
+
+/* ── Avatar ── */
+.doc-card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5B8FA8, #3E7289);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.doc-card-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1A2D3D;
+  margin: 0 0 4px;
+}
+
+.doc-card-spec {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #5B8FA8;
+  margin: 0 0 4px;
+}
+
+.doc-card-qual {
+  font-size: 0.75rem;
+  color: #7A92A5;
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+/* ── Stats row inside card ── */
+.doc-card-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  background: #F0F7FA;
+  border-radius: 10px;
+  padding: 12px 0;
+  margin-bottom: 14px;
+}
+
+.doc-card-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.doc-card-stat-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A2D3D;
+}
+
+.doc-card-stat-lbl {
+  font-size: 0.68rem;
+  color: #7A92A5;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.doc-card-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: #D5DEE5;
+  flex-shrink: 0;
+}
+
+/* ── Tags ── */
+.doc-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.doc-card-tag {
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #EAF0F4;
+  color: #5A7282;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* ── Expanded details ── */
+.doc-card-expanded {
+  width: 100%;
+  text-align: left;
+  padding-top: 14px;
+  border-top: 1px solid #E8EFF3;
+  margin-bottom: 10px;
+}
+
+.doc-card-bio {
+  font-size: 0.82rem;
+  color: #3D5468;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+.doc-card-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #5A7282;
+  margin-bottom: 6px;
+}
+
+.doc-card-detail-row svg {
+  color: #5B8FA8;
+  flex-shrink: 0;
+}
+
+/* ── Toggle button ── */
+.doc-card-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1.5px solid #D5DEE5;
+  background: #fff;
+  color: #5B8FA8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-top: auto;
+}
+
+.doc-card-toggle:hover {
+  background: #F0F7FA;
+  border-color: #5B8FA8;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .doc-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .doc-page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .doc-page-title {
+    font-size: 1.3rem;
+  }
+
+  .doc-page-subtitle {
+    font-size: 0.84rem;
+  }
+
+  .doc-header-stats {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .doc-header-stat-val {
+    font-size: 1.15rem;
+  }
+
+  .doc-filters {
+    gap: 6px;
+  }
+
+  .doc-filter-chip {
+    padding: 6px 14px;
+    font-size: 0.78rem;
+  }
+
+  .doc-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .doc-card {
+    padding: 24px 20px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .doc-card-stats {
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 0;
+  }
+
+  .doc-card-stat-divider {
+    width: 60%;
+    height: 1px;
+  }
+
+  .doc-card-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 0.95rem;
+  }
+
+  .doc-card-name {
+    font-size: 0.95rem;
+  }
+
+  .doc-card-tags {
+    gap: 5px;
+  }
+
+  .doc-card-tag {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+  }
+
+  .doc-header-stats {
+    gap: 12px;
+  }
+}

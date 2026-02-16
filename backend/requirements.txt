@@ -1,0 +1,10 @@
+flask
+requests
+videosdk
+PyJWT
+flask-sqlalchemy
+psycopg2-binary
+flask-migrate
+flask-cors
+python-dotenv
+werkzeug

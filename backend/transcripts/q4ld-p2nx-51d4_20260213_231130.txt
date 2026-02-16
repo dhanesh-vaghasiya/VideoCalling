@@ -1,0 +1,4 @@
+[23:11:30] === Transcript for meeting q4ld-p2nx-51d4 ===
+
+[23:11:35] State changed → {'id': '100096e5-4317-413a-b50d-179edd82faaa', 'status': 'TRANSCRIPTION_STARTING'}
+[23:11:38] State changed → {'id': '100096e5-4317-413a-b50d-179edd82faaa', 'status': 'TRANSCRIPTION_STARTED'}

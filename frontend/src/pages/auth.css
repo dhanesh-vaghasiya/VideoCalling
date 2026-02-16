@@ -1,0 +1,281 @@
+/* ═══════════════════════════════════════════════════════
+   Auth pages – Nova Hospital teal theme
+   ═══════════════════════════════════════════════════════ */
+
+.auth-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(160deg, #EAF0F4 0%, #D1E7EF 40%, #A8D0DE 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle medical decorative shapes */
+.auth-bg::before,
+.auth-bg::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+}
+.auth-bg::before {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(91, 143, 168, 0.08) 0%, transparent 70%);
+  top: -200px;
+  right: -200px;
+  animation: authFloat 22s infinite ease-in-out;
+}
+.auth-bg::after {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(62, 114, 137, 0.06) 0%, transparent 70%);
+  bottom: -180px;
+  left: -180px;
+  animation: authFloat 17s infinite ease-in-out reverse;
+}
+
+@keyframes authFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(20px, 20px); }
+}
+
+/* ── Card ───────────────────────────────── */
+.auth-card {
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  padding: 44px 38px;
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(26, 45, 61, 0.1),
+              0 0 0 1px rgba(91, 143, 168, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.auth-logo {
+  font-size: 44px;
+  margin-bottom: 12px;
+}
+
+.auth-card h1 {
+  font-size: 1.75rem;
+  color: var(--text-dark, #1A2D3D);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.auth-subtitle {
+  color: var(--text-muted, #7A92A5);
+  font-size: 0.92rem;
+  margin-bottom: 26px;
+}
+
+/* ── Role toggle ────────────────────────── */
+.role-toggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 22px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #D5DEE5;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: #fff;
+  color: #3D5468;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.role-btn.active {
+  background: linear-gradient(135deg, #5B8FA8 0%, #3E7289 100%);
+  color: #fff;
+}
+
+/* ── Inputs ─────────────────────────────── */
+.auth-card .input-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.auth-card .input-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3D5468;
+  margin-bottom: 6px;
+}
+
+.auth-card input,
+.auth-card select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 2px solid #D5DEE5;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: #fff;
+  color: #1A2D3D;
+  font-family: inherit;
+}
+
+.auth-card input:focus,
+.auth-card select:focus {
+  outline: none;
+  border-color: #5B8FA8;
+  box-shadow: 0 0 0 3px rgba(91, 143, 168, 0.15);
+}
+
+.auth-card input::placeholder {
+  color: #a0b3c0;
+}
+
+/* Two-column row */
+.input-row {
+  display: flex;
+  gap: 12px;
+}
+.input-row .input-group {
+  flex: 1;
+}
+
+/* ── Submit button ──────────────────────── */
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #5B8FA8 0%, #3E7289 100%);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(91, 143, 168, 0.35);
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(91, 143, 168, 0.5);
+}
+
+.auth-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Error banner ───────────────────────── */
+.auth-error {
+  background: #fff5f5;
+  color: #D14E4E;
+  border: 1px solid #f5bfbf;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+/* ── Footer link ────────────────────────── */
+.auth-footer {
+  margin-top: 24px;
+  font-size: 0.9rem;
+  color: #7A92A5;
+}
+
+/* ── Auth hint (role description) ────────── */
+.auth-hint {
+  background: #E8F3F7;
+  color: #3E7289;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin-bottom: 18px;
+  text-align: left;
+  line-height: 1.45;
+}
+
+.auth-footer a {
+  color: #5B8FA8;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-footer a:hover {
+  text-decoration: underline;
+  color: #3E7289;
+}
+
+/* ── Responsive ─────────────────────────── */
+@media (max-width: 540px) {
+  .auth-bg {
+    padding: 16px 12px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
+  .auth-card {
+    padding: 32px 20px;
+    border-radius: 16px;
+  }
+
+  .auth-card h1 {
+    font-size: 1.45rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .input-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .role-toggle {
+    border-radius: 10px;
+  }
+
+  .role-btn {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .auth-btn {
+    padding: 12px;
+    font-size: 0.92rem;
+  }
+
+  .auth-logo {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 380px) {
+  .auth-card {
+    padding: 24px 16px;
+  }
+
+  .auth-card h1 {
+    font-size: 1.3rem;
+  }
+
+  .auth-card input,
+  .auth-card select {
+    padding: 10px 12px;
+    font-size: 0.88rem;
+  }
+}
