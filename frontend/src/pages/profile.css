@@ -190,6 +190,112 @@
   background: #2E9E6B;
 }
 
+/* ── My Patients list ── */
+.prof-patient-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 20px;
+  background: #5B8FA8;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.prof-patients-empty {
+  font-size: 0.88rem;
+  color: #7A92A5;
+  text-align: center;
+  padding: 24px 0;
+  margin: 0;
+}
+
+.prof-patients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prof-patient-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #F8FAFB;
+  border: 1px solid #E8EFF3;
+  border-radius: 10px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.prof-patient-row:hover {
+  background: #EAF5FA;
+  border-color: #C8DCE5;
+}
+
+.prof-patient-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7AAFBF, #5B8FA8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.prof-patient-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.prof-patient-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1A2D3D;
+}
+
+.prof-patient-meta {
+  font-size: 0.78rem;
+  color: #7A92A5;
+}
+
+.prof-patient-date {
+  font-size: 0.75rem;
+  color: #9AB2C0;
+  white-space: nowrap;
+}
+
+.prof-patient-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #B5C6D0;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.prof-patient-delete:hover {
+  background: #FDECEA;
+  color: #D64545;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .prof-card-top {

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout, getAuthData } from "../services/auth";
+import { getAppointments, getDoctors } from "../services/appointment";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import StatsCards from "../components/StatsCards";
@@ -12,32 +14,41 @@ function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [appointments, setAppointments] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (!stored) {
-      navigate("/login");
-      return;
+    const { user: storedUser } = getAuthData();
+    if (storedUser) setUser(storedUser);
+
+    getDoctors()
+      .then((data) => setDoctors(data))
+      .catch((err) => console.error("Failed to load doctors:", err));
+  }, []);
+
+  // Fetch appointments from backend whenever user is loaded
+  useEffect(() => {
+    if (!user) return;
+    getAppointments()
+      .then((data) => setAppointments(data))
+      .catch((err) => console.error("Failed to load appointments:", err));
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      navigate("/login", { replace: true });
     }
-    setUser(JSON.parse(stored));
-
-    const savedAppts = localStorage.getItem("appointments");
-    if (savedAppts) setAppointments(JSON.parse(savedAppts));
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
   };
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
   const handleNewAppointment = (newAppt) => {
-    const updated = [newAppt, ...appointments];
-    setAppointments(updated);
-    localStorage.setItem("appointments", JSON.stringify(updated));
+    setAppointments((prev) => [newAppt, ...prev]);
     setShowModal(false);
   };
 
@@ -75,6 +86,7 @@ function Dashboard() {
       {showModal && (
         <AppointmentModal
           user={user}
+          doctors={doctors}
           onClose={closeModal}
           onSubmit={handleNewAppointment}
         />

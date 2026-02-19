@@ -1,14 +1,57 @@
-import { useState } from "react";
-import { DOCTORS, CONSULTATION_TYPES, SYMPTOMS, RELATIONS } from "../constants";
+import { useState, useEffect } from "react";
+import { CONSULTATION_TYPES, SYMPTOMS, RELATIONS } from "../constants";
+import { bookAppointment, getPatients } from "../services/appointment";
 
-function AppointmentModal({ user, onClose, onSubmit }) {
+function AppointmentModal({ user, doctors = [], onClose, onSubmit }) {
   const [step, setStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Saved patients for quick-select
+  const [savedPatients, setSavedPatients] = useState([]);
+  const [selectedPatientId, setSelectedPatientId] = useState(""); // "" = new patient
+  const [loadingPatients, setLoadingPatients] = useState(true);
 
   // Step 1 – Patient details
   const [patientName, setPatientName] = useState("");
   const [relation, setRelation] = useState("");
   const [patientAge, setPatientAge] = useState("");
   const [patientGender, setPatientGender] = useState("");
+
+  // Fetch saved patients on mount
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const data = await getPatients();
+        setSavedPatients(Array.isArray(data) ? data : []);
+      } catch {
+        setSavedPatients([]);
+      } finally {
+        setLoadingPatients(false);
+      }
+    };
+    if (user?.role === "user") fetchPatients();
+    else setLoadingPatients(false);
+  }, [user]);
+
+  // When a saved patient is selected, auto-fill fields
+  const handlePatientSelect = (id) => {
+    setSelectedPatientId(id);
+    if (id === "") {
+      // New patient – clear fields
+      setPatientName("");
+      setRelation("");
+      setPatientAge("");
+      setPatientGender("");
+      return;
+    }
+    const p = savedPatients.find((pt) => String(pt.id) === String(id));
+    if (p) {
+      setPatientName(p.fullName || "");
+      setRelation(p.relation || "");
+      setPatientAge(String(p.age ?? ""));
+      setPatientGender(p.gender || "");
+    }
+  };
 
   // Step 2 – Consultation details
   const [consultationType, setConsultationType] = useState("");
@@ -50,31 +93,43 @@ function AppointmentModal({ user, onClose, onSubmit }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!otpVerified) return alert("Please verify your mobile number first.");
+    if (submitting) return;
 
-    const doctor = DOCTORS.find((d) => d.id === Number(selectedDoctor));
-    const newAppt = {
-      id: Date.now(),
-      patientName,
-      relation,
-      patientAge,
-      patientGender,
-      consultationType: CONSULTATION_TYPES.find((c) => c.value === consultationType)?.label || consultationType,
-      symptoms: selectedSymptoms,
-      doctor: doctor.name,
-      specialization: doctor.specialization,
-      fee: doctor.fee,
-      date: appointmentDate,
-      time: appointmentTime,
-      mobile: mobile.replace(/\D/g, ""),
-      status: "Pending",
-      requestedOn: new Date().toISOString(),
-      bookedBy: user.fullName,
-    };
+    const doctor = doctors.find((d) => d.id === Number(selectedDoctor));
 
-    onSubmit(newAppt);
+    try {
+      setSubmitting(true);
+      const { appointment } = await bookAppointment({
+        patientName,
+        relation,
+        patientAge: Number(patientAge),
+        patientGender,
+        doctorId: doctor.id,
+        consultationType:
+          CONSULTATION_TYPES.find((c) => c.value === consultationType)?.label || consultationType,
+        symptoms: selectedSymptoms,
+        date: appointmentDate,
+        time: appointmentTime,
+        mobile: mobile.replace(/\D/g, ""),
+      });
+
+      // Pass enriched data back so Dashboard can update immediately
+      onSubmit({
+        ...appointment,
+        doctor: doctor.name,
+        specialization: doctor.specialization,
+        fee: doctor.fee,
+        bookedBy: user.fullName,
+        requestedOn: appointment.createdAt,
+      });
+    } catch (err) {
+      alert(err.message || "Failed to book appointment. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -101,6 +156,38 @@ function AppointmentModal({ user, onClose, onSubmit }) {
                 <p className="dash-step-label">Step 1 of 3 — Patient Information</p>
                 <p className="dash-step-hint">Who is this appointment for?</p>
 
+                {/* ── Quick-select saved patient ── */}
+                {user?.role === "user" && savedPatients.length > 0 && (
+                  <div className="dash-form-group">
+                    <label>Quick Select a Saved Patient</label>
+                    <div className="dash-patient-quick-select">
+                      <div
+                        className={`dash-patient-chip ${selectedPatientId === "" ? "selected" : ""}`}
+                        onClick={() => handlePatientSelect("")}
+                      >
+                        <span className="dash-patient-chip-icon">+</span>
+                        <span>New Patient</span>
+                      </div>
+                      {savedPatients.map((p) => (
+                        <div
+                          key={p.id}
+                          className={`dash-patient-chip ${String(selectedPatientId) === String(p.id) ? "selected" : ""}`}
+                          onClick={() => handlePatientSelect(String(p.id))}
+                        >
+                          <span className="dash-patient-chip-avatar">
+                            {p.fullName?.charAt(0)?.toUpperCase() || "?"}
+                          </span>
+                          <div className="dash-patient-chip-info">
+                            <span className="dash-patient-chip-name">{p.fullName}</span>
+                            <span className="dash-patient-chip-meta">{p.relation} · {p.age} yrs · {p.gender}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {loadingPatients && <p className="dash-step-hint" style={{ margin: "6px 0 0" }}>Loading saved patients…</p>}
+                  </div>
+                )}
+
                 <div className="dash-form-group">
                   <label>Patient&apos;s Full Name *</label>
                   <input
@@ -109,12 +196,20 @@ function AppointmentModal({ user, onClose, onSubmit }) {
                     value={patientName}
                     onChange={(e) => setPatientName(e.target.value)}
                     required
+                    readOnly={selectedPatientId !== ""}
+                    className={selectedPatientId !== "" ? "dash-input-readonly" : ""}
                   />
                 </div>
 
                 <div className="dash-form-group">
                   <label>Relation to You *</label>
-                  <select value={relation} onChange={(e) => setRelation(e.target.value)} required>
+                  <select
+                    value={relation}
+                    onChange={(e) => setRelation(e.target.value)}
+                    required
+                    disabled={selectedPatientId !== ""}
+                    className={selectedPatientId !== "" ? "dash-input-readonly" : ""}
+                  >
                     <option value="">Select relation…</option>
                     {RELATIONS.map((r) => (
                       <option key={r} value={r}>{r}</option>
@@ -133,11 +228,19 @@ function AppointmentModal({ user, onClose, onSubmit }) {
                       value={patientAge}
                       onChange={(e) => setPatientAge(e.target.value)}
                       required
+                      readOnly={selectedPatientId !== ""}
+                      className={selectedPatientId !== "" ? "dash-input-readonly" : ""}
                     />
                   </div>
                   <div className="dash-form-group">
                     <label>Gender *</label>
-                    <select value={patientGender} onChange={(e) => setPatientGender(e.target.value)} required>
+                    <select
+                      value={patientGender}
+                      onChange={(e) => setPatientGender(e.target.value)}
+                      required
+                      disabled={selectedPatientId !== ""}
+                      className={selectedPatientId !== "" ? "dash-input-readonly" : ""}
+                    >
                       <option value="">Select…</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -203,9 +306,9 @@ function AppointmentModal({ user, onClose, onSubmit }) {
                     required
                   >
                     <option value="">Choose a doctor…</option>
-                    {DOCTORS.filter((d) => d.available).map((d) => (
+                    {doctors.filter((d) => d.available).map((d) => (
                       <option key={d.id} value={d.id}>
-                        {d.name} — {d.specialization} (₹{d.fee})
+                        {d.name || d.fullName} — {d.specialization} (₹{d.fee})
                       </option>
                     ))}
                   </select>
@@ -260,7 +363,7 @@ function AppointmentModal({ user, onClose, onSubmit }) {
                   </div>
                   <div className="dash-review-row">
                     <span className="dash-review-label">Doctor</span>
-                    <span>{DOCTORS.find((d) => d.id === Number(selectedDoctor))?.name}</span>
+                    <span>{doctors.find((d) => d.id === Number(selectedDoctor))?.name || doctors.find((d) => d.id === Number(selectedDoctor))?.fullName}</span>
                   </div>
                   <div className="dash-review-row">
                     <span className="dash-review-label">Date & Time</span>
@@ -343,8 +446,8 @@ function AppointmentModal({ user, onClose, onSubmit }) {
               </button>
             )}
             {step === 3 && (
-              <button type="submit" className="dash-btn dash-btn-primary" disabled={!otpVerified}>
-                Confirm Appointment
+              <button type="submit" className="dash-btn dash-btn-primary" disabled={!otpVerified || submitting}>
+                {submitting ? "Booking…" : "Confirm Appointment"}
               </button>
             )}
           </div>

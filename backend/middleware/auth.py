@@ -23,7 +23,7 @@ import jwt
 from flask import request, jsonify
 
 from middleware.token import decode_token
-from model import User
+from model import get_account_by_role
 
 
 def token_required(f):
@@ -35,6 +35,7 @@ def token_required(f):
 
         if not auth_header.startswith("Bearer "):
             return jsonify({"error": "Missing or malformed Authorization header"}), 401
+        
 
         token = auth_header.split(" ", 1)[1]
 
@@ -48,11 +49,12 @@ def token_required(f):
         if payload.get("type") != "access":
             return jsonify({"error": "Invalid token type"}), 401
 
-        user = User.query.get(payload["sub"])
-        if not user:
-            return jsonify({"error": "User not found"}), 401
+        role = payload.get("role", "user")
+        account = get_account_by_role(role, int(payload["sub"]))
+        if not account:
+            return jsonify({"error": "Account not found"}), 401
 
-        kwargs["current_user"] = user
+        kwargs["current_user"] = account
         return f(*args, **kwargs)
 
     return decorated

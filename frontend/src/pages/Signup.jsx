@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { signup } from "../services/auth";
 import "./auth.css";
 
 function Signup() {
@@ -19,39 +20,67 @@ function Signup() {
     city: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (!form.fullName || !form.email || !form.phone || !form.password) {
+      setLoading(false);
       return setError("Please fill in all required fields.");
     }
     if (form.password !== form.confirmPassword) {
+      setLoading(false);
       return setError("Passwords do not match.");
     }
     if (form.password.length < 6) {
+      setLoading(false);
       return setError("Password must be at least 6 characters.");
     }
     if (role === "doctor" && !form.specialization) {
+      setLoading(false);
       return setError("Specialization is required for doctors.");
     }
 
-    // TODO: call backend signup API
-    console.log("Signup payload:", { role, ...form });
+    try {
+      const payload = {
+        fullName: form.fullName,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+        role: role,
+      };
 
-    // Cache signup data so login can build the full user profile
-    localStorage.setItem(
-      "signupData",
-      JSON.stringify({ role, ...form })
-    );
+      // Add role-specific fields
+      if (role === "doctor") {
+        payload.specialization = form.specialization;
+        if (form.licenseNumber) {
+          payload.licenseNumber = form.licenseNumber;
+        }
+      } else {
+        if (form.address) payload.address = form.address;
+        if (form.city) payload.city = form.city;
+      }
 
-    alert("Account created successfully! Please log in.");
-    navigate("/login");
+      const response = await signup(payload);
+
+      // Navigate based on user role
+      if (response.user.role === "doctor") {
+        navigate("/doctor-dashboard", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    } catch (err) {
+      setError(err.message || "Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -192,8 +221,8 @@ function Signup() {
             </div>
           )}
 
-          <button type="submit" className="auth-btn">
-            Sign Up as {role === "doctor" ? "Doctor" : "User"}
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Creating Account..." : `Sign Up as ${role === "doctor" ? "Doctor" : "User"}`}
           </button>
         </form>
 

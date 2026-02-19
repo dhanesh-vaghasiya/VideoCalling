@@ -26,12 +26,17 @@ def create_app(config_class=Config):
     from routes.auth import auth_bp
     from routes.meeting import meeting_bp
     from routes.transcription import transcription_bp
+    from routes.patient import patient_bp
+    from routes.appointment import appointment_bp
+    from routes.doctor import doctor_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(meeting_bp)
     app.register_blueprint(transcription_bp)
+    app.register_blueprint(patient_bp)
+    app.register_blueprint(appointment_bp)
+    app.register_blueprint(doctor_bp)
 
-    # ── Backward-compatible aliases (old frontend endpoints) ──
     from services.videosdk import create_room, generate_token
     import transcription_bot
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout, getAuthData } from "../services/auth";
 import Navbar from "../components/Navbar";
 import "./about.css";
 
@@ -47,17 +48,18 @@ function About() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (!stored) {
-      navigate("/login");
-      return;
-    }
-    setUser(JSON.parse(stored));
-  }, [navigate]);
+    const { user: storedUser } = getAuthData();
+    if (storedUser) setUser(storedUser);
+  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      navigate("/login", { replace: true });
+    }
   };
 
   if (!user) return null;

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { logout, getAuthData } from '../services/auth';
+import { getAppointments, updateAppointmentStatus } from '../services/appointment';
 import './DoctorDashboard.css';
 
 const DoctorDashboard = () => {
@@ -37,23 +39,56 @@ const DoctorDashboard = () => {
     const [requests, setRequests] = useState([]);
 
     useEffect(() => {
-        // Load User
-        const user = JSON.parse(localStorage.getItem('currentUser'));
+        // Load User from auth data
+        const { user } = getAuthData();
         if (user && user.role === 'doctor') {
-            setDoctorName(user.name);
+            setDoctorName(user.fullName || user.name || 'Doctor');
         }
 
-        // Load Requests from LocalStorage (Simulated Backend)
-        const storedRequests = JSON.parse(localStorage.getItem('hospitalRequests') || '[]');
-        if (storedRequests.length > 0) {
-            setRequests(storedRequests.reverse());
-        } else {
-            // Fallback Mock Data if empty
-            setRequests([
-                { id: 1, name: "John Doe", requestDate: "2023-11-25", requestTime: "10:00 AM", reason: "Fever", status: "Pending", medicalHistory: "None", reports: [] },
-                { id: 2, name: "Sarah Connor", requestDate: "2023-11-26", requestTime: "11:30 AM", reason: "Headache", status: "Pending", medicalHistory: "Migraine", reports: [] }
-            ]);
-        }
+        // Fetch real appointments from the API
+        getAppointments()
+            .then((data) => {
+                setRequests(data);
+
+                // Build schedule from today's confirmed appointments
+                const today = new Date().toISOString().split('T')[0];
+                const todayAppts = data.filter(
+                    (a) => a.date === today && a.status === 'Confirmed'
+                );
+                setSchedule(
+                    todayAppts.map((a) => ({
+                        id: a.id,
+                        time: a.time,
+                        name: a.patientName,
+                        reason: a.consultationType,
+                        status: a.status,
+                    }))
+                );
+
+                // Build history from completed appointments
+                const completedAppts = data.filter((a) => a.status === 'Completed');
+                setHistory(
+                    completedAppts.slice(0, 5).map((a) => ({
+                        id: a.id,
+                        date: a.date,
+                        name: a.patientName,
+                        diagnosis: a.consultationType,
+                        status: a.status,
+                    }))
+                );
+
+                // Update stats
+                const pending = data.filter((a) => a.status === 'Pending').length;
+                const confirmed = data.filter((a) => a.status === 'Confirmed').length;
+                const completed = data.filter((a) => a.status === 'Completed').length;
+                setStats({
+                    totalPatients: data.length,
+                    todayAppointments: todayAppts.length,
+                    pendingRequests: pending,
+                    consultations: completed,
+                });
+            })
+            .catch((err) => console.error('Failed to load appointments:', err));
     }, []);
 
     // Filter Logic
@@ -68,7 +103,7 @@ const DoctorDashboard = () => {
         const user = {
             id: request.id,
             name: request.patientName || request.name,
-            reason: request.reason,
+            reason: request.consultationType || request.reason,
             requestDate: request.date || request.requestDate,
             requestTime: request.time || request.requestTime,
             status: request.status || 'Pending',
@@ -77,6 +112,16 @@ const DoctorDashboard = () => {
             ...request
         };
         navigate('/people', { state: { user } });
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            navigate('/login', { replace: true });
+        }
     };
 
     return (
@@ -92,6 +137,9 @@ const DoctorDashboard = () => {
                         🔔 <span className="badge">{requests.filter(r => (r.status || 'Pending') === 'Pending').length}</span>
                     </button>
                     <div className="profile-pic">{doctorName.charAt(0)}</div>
+                    <button className="icon-btn logout-btn" onClick={handleLogout} title="Log out">
+                        🚪
+                    </button>
                 </div>
             </header>
 
@@ -165,8 +213,9 @@ const DoctorDashboard = () => {
                                 <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
                                     <option value="All">All Status</option>
                                     <option value="Pending">Pending</option>
-                                    <option value="Scheduled">Scheduled</option>
+                                    <option value="Confirmed">Confirmed</option>
                                     <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
                                 </select>
                             </div>
                         </div>
@@ -198,7 +247,7 @@ const DoctorDashboard = () => {
                                                         <small>{req.time || req.requestTime}</small>
                                                     </div>
                                                 </td>
-                                                <td>{req.reason}</td>
+                                                <td>{req.consultationType || req.reason}</td>
                                                 <td>
                                                     <span className={`status-pill pill-${(req.status || 'Pending').toLowerCase()}`}>
                                                         {req.status || 'Pending'}

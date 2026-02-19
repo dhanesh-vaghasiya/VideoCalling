@@ -772,6 +772,93 @@
   background: #fff;
 }
 
+/* ── Patient quick-select ── */
+.dash-patient-quick-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.dash-patient-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 2px solid #D5DEE5;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #F8FAFB;
+  min-width: 150px;
+}
+
+.dash-patient-chip:hover {
+  border-color: #5B8FA8;
+  background: #EAF5FA;
+}
+
+.dash-patient-chip.selected {
+  border-color: #5B8FA8;
+  background: #E0F0F7;
+  box-shadow: 0 0 0 3px rgba(91, 143, 168, 0.12);
+}
+.dash-patient-chip-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5B8FA8, #3E7289);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* font-size: 1.1rem; */
+  font-weight: 700;
+  /* flex-shrink: 0; */
+  /* line-height: 1; */
+}
+
+.dash-patient-chip-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7AAFBF, #5B8FA8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.dash-patient-chip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.dash-patient-chip-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1A2D3D;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-patient-chip-meta {
+  font-size: 0.72rem;
+  color: #7A92A5;
+}
+
+.dash-input-readonly {
+  background: #EEF2F5 !important;
+  cursor: default !important;
+  color: #5A6F7F !important;
+}
+
 .dash-form-row {
   display: flex;
   gap: 12px;

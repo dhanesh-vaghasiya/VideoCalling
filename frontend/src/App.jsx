@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ProtectedRoute, GuestRoute } from "./components/ProtectedRoute";
 import Meeting from "./pages/Meeting";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -13,33 +14,25 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Auth Pages */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        {/* ── Guest-only pages (redirect to dashboard if already logged in) ── */}
+        <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+        <Route path="/signup" element={<GuestRoute><Signup /></GuestRoute>} />
 
-        {/* Dashboard – main page */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* ── User-only pages ── */}
+        <Route path="/dashboard" element={<ProtectedRoute requiredRole="user"><Dashboard /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute requiredRole="user"><Profile /></ProtectedRoute>} />
+        <Route path="/about" element={<ProtectedRoute requiredRole="user" ><About /></ProtectedRoute>} />
+        <Route path="/doctors" element={<ProtectedRoute requiredRole="user"><Doctors /></ProtectedRoute>} />
 
-        {/* Profile page */}
-        <Route path="/profile" element={<Profile />} />
+        {/* ── Doctor-only pages ── */}
+        <Route path="/doctor-dashboard" element={<ProtectedRoute requiredRole="doctor"><DoctorDashboard /></ProtectedRoute>} />
+        <Route path="/people" element={<ProtectedRoute requiredRole="doctor"><People /></ProtectedRoute>} />
 
-        {/* About Us */}
-        <Route path="/about" element={<About />} />
+        {/* ── Shared authenticated pages ── */}
+        <Route path="/meeting/:id" element={<ProtectedRoute><Meeting /></ProtectedRoute>} />
 
-        {/* Doctors */}
-        <Route path="/doctors" element={<Doctors />} />
-
-        {/* Doctor Dashboard */}
-        <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-
-        {/* People (Patient Detail for Doctor) */}
-        <Route path="/people" element={<People />} />
-
-        {/* Meeting Page */}
-        <Route path="/meeting/:id" element={<Meeting />} />
-
-        {/* Default: send to dashboard (redirects to login if not authed) */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        {/* Default: send to login (route guards handle the rest) */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

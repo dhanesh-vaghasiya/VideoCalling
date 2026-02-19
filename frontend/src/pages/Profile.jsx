@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout, getAuthData } from "../services/auth";
+import { getPatients, deletePatient } from "../services/appointment";
 import Navbar from "../components/Navbar";
 import "./profile.css";
 
@@ -8,21 +10,48 @@ function Profile() {
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({});
+  const [patients, setPatients] = useState([]);
+  const [patientsLoading, setPatientsLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (!stored) {
-      navigate("/login");
-      return;
+    const { user: storedUser } = getAuthData();
+    if (storedUser) {
+      setUser(storedUser);
+      setForm(storedUser);
     }
-    const parsed = JSON.parse(stored);
-    setUser(parsed);
-    setForm(parsed);
-  }, [navigate]);
+  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
+  // Fetch saved patients for this user
+  useEffect(() => {
+    if (!user || user.role !== "user") { setPatientsLoading(false); return; }
+    const fetchPatients = async () => {
+      try {
+        const data = await getPatients();
+        setPatients(Array.isArray(data) ? data : []);
+      } catch { setPatients([]); }
+      finally { setPatientsLoading(false); }
+    };
+    fetchPatients();
+  }, [user]);
+
+  const handleDeletePatient = async (id) => {
+    if (!window.confirm("Remove this patient from your saved list?")) return;
+    try {
+      await deletePatient(id);
+      setPatients((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      alert(err.message || "Failed to delete patient");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      navigate("/login", { replace: true });
+    }
   };
 
   const handleChange = (e) => {
@@ -194,6 +223,50 @@ function Profile() {
             </div>
           )}
         </div>
+
+        {/* My Patients section (only for users) */}
+        {user.role === "user" && (
+          <div className="prof-details" style={{ marginTop: 20 }}>
+            <h3 className="prof-section-title">
+              My Patients
+              <span className="prof-patient-count">{patients.length}</span>
+            </h3>
+
+            {patientsLoading ? (
+              <p className="prof-patients-empty">Loading patients…</p>
+            ) : patients.length === 0 ? (
+              <p className="prof-patients-empty">
+                No patients saved yet. When you book an appointment, the patient details are automatically saved here for quick reuse.
+              </p>
+            ) : (
+              <div className="prof-patients-list">
+                {patients.map((p) => (
+                  <div className="prof-patient-row" key={p.id}>
+                    <div className="prof-patient-avatar">
+                      {p.fullName?.charAt(0)?.toUpperCase() || "?"}
+                    </div>
+                    <div className="prof-patient-info">
+                      <span className="prof-patient-name">{p.fullName}</span>
+                      <span className="prof-patient-meta">
+                        {p.relation} · {p.age} yrs · {p.gender}
+                      </span>
+                    </div>
+                    <span className="prof-patient-date">
+                      Added {p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—"}
+                    </span>
+                    <button
+                      className="prof-patient-delete"
+                      title="Remove patient"
+                      onClick={() => handleDeletePatient(p.id)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" /></svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Account section */}
         <div className="prof-details" style={{ marginTop: 20 }}>

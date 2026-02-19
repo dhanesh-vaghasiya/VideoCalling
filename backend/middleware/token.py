@@ -24,7 +24,7 @@ def create_token(
     """Return a signed HS256 JWT string."""
     now = datetime.now(timezone.utc)
     payload = {
-        "sub":  user_id,
+        "sub":  str(user_id),
         "role": role,
         "type": token_type,
         "iat":  now,

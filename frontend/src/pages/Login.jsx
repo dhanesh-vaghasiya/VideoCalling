@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { login } from "../services/auth";
 import "./auth.css";
 
 function Login() {
@@ -7,42 +8,40 @@ function Login() {
   const [role, setRole] = useState("user");
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (!form.email || !form.password) {
+      setLoading(false);
       return setError("Please fill in all fields.");
     }
 
-    // TODO: call backend login API
-    console.log("Login payload:", { role, ...form });
+    try {
+      const response = await login({
+        email: form.email,
+        password: form.password,
+        role: role,
+      });
 
-    // Build user profile from cached signup data if available
-    const signupRaw = localStorage.getItem("signupData");
-    const signup = signupRaw ? JSON.parse(signupRaw) : {};
-
-    const user = {
-      fullName: signup.fullName || form.email.split("@")[0],
-      email: form.email,
-      phone: signup.phone || "",
-      role,
-      // Doctor fields
-      specialization: signup.specialization || "",
-      licenseNumber: signup.licenseNumber || "",
-      // User fields
-      address: signup.address || "",
-      city: signup.city || "",
-    };
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.removeItem("signupData");
-
-    navigate(role === "doctor" ? "/doctor-dashboard" : "/dashboard");
+      // Navigate based on user role
+      if (response.user.role === "doctor") {
+        navigate("/doctor-dashboard", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -101,8 +100,8 @@ function Login() {
             />
           </div>
 
-          <button type="submit" className="auth-btn">
-            Log In as {role === "doctor" ? "Doctor" : "User"}
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Logging in..." : `Log In as ${role === "doctor" ? "Doctor" : "User"}`}
           </button>
         </form>
 

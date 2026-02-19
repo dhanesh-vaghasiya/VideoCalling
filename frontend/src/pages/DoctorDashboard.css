@@ -56,6 +56,16 @@
     transform: translateY(-2px);
 }
 
+.logout-btn {
+    background: #fff0f0;
+    color: #e74c3c;
+    font-size: 1.3rem;
+}
+
+.logout-btn:hover {
+    background: #ffe0e0;
+}
+
 .badge {
     position: absolute;
     top: -5px;

@@ -1,37 +1,47 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout, getAuthData } from "../services/auth";
+import { getDoctors } from "../services/appointment";
 import Navbar from "../components/Navbar";
-import { DOCTORS } from "../constants";
 import "./doctors.css";
 
 function Doctors() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [doctors, setDoctors] = useState([]);
   const [filter, setFilter] = useState("All");
   const [expandedId, setExpandedId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (!stored) {
-      navigate("/login");
-      return;
-    }
-    setUser(JSON.parse(stored));
-  }, [navigate]);
+    const { user: storedUser } = getAuthData();
+    if (storedUser) setUser(storedUser);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
+    getDoctors()
+      .then((data) => setDoctors(data))
+      .catch((err) => console.error("Failed to load doctors:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      navigate("/login", { replace: true });
+    }
   };
 
   if (!user) return null;
+  if (loading) return <div className="dash"><p style={{ padding: "2rem", textAlign: "center" }}>Loading doctors…</p></div>;
 
   const initials = user.fullName
     ? user.fullName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
     : "U";
 
-  const departments = ["All", ...new Set(DOCTORS.map((d) => d.department))];
-  const filtered = filter === "All" ? DOCTORS : DOCTORS.filter((d) => d.department === filter);
+  const departments = ["All", ...new Set(doctors.map((d) => d.department).filter(Boolean))];
+  const filtered = filter === "All" ? doctors : doctors.filter((d) => d.department === filter);
 
   return (
     <div className="dash">
@@ -43,20 +53,20 @@ function Doctors() {
           <div>
             <h1 className="doc-page-title">Our Doctors</h1>
             <p className="doc-page-subtitle">
-              Meet our team of {DOCTORS.length} highly qualified specialists committed to your health and well-being.
+              Meet our team of {doctors.length} highly qualified specialists committed to your health and well-being.
             </p>
           </div>
           <div className="doc-header-stats">
             <div className="doc-header-stat">
-              <span className="doc-header-stat-val">{DOCTORS.length}</span>
+              <span className="doc-header-stat-val">{doctors.length}</span>
               <span className="doc-header-stat-label">Specialists</span>
             </div>
             <div className="doc-header-stat">
-              <span className="doc-header-stat-val">{DOCTORS.filter((d) => d.available).length}</span>
+              <span className="doc-header-stat-val">{doctors.filter((d) => d.available).length}</span>
               <span className="doc-header-stat-label">Available Now</span>
             </div>
             <div className="doc-header-stat">
-              <span className="doc-header-stat-val">{new Set(DOCTORS.map((d) => d.department)).size}</span>
+              <span className="doc-header-stat-val">{new Set(doctors.map((d) => d.department)).size}</span>
               <span className="doc-header-stat-label">Departments</span>
             </div>
           </div>
@@ -86,11 +96,11 @@ function Doctors() {
 
               {/* Avatar */}
               <div className="doc-card-avatar">
-                {doc.name.split(" ").slice(0, 2).map((w) => w[0]).join("")}
+                {(doc.name || doc.fullName || "").split(" ").slice(0, 2).map((w) => w[0]).join("")}
               </div>
 
               {/* Name & specialty */}
-              <h3 className="doc-card-name">{doc.name}</h3>
+              <h3 className="doc-card-name">{doc.name || doc.fullName}</h3>
               {/* <p className="doc-card-spec">{doc.specialization}</p> */}
               <p className="doc-card-qual">{doc.qualification}</p>
 
