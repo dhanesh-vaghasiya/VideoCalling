@@ -1,6 +1,7 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import "./meeting.css";
+import ReactMarkdown from 'react-markdown';
 
 const API_BASE = "http://localhost:5000";
 
@@ -21,6 +22,13 @@ function Meeting() {
   const [joined, setJoined] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [showSummarizeView, setShowSummarizeView] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const transcriptRef = useRef("");
+  const [summaryCountdown, setSummaryCountdown] = useState(60); // 1 minute
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [summaryResult, setSummaryResult] = useState("");
 
   /* ── Fetch a fresh token if we don't already have one (join flow) ── */
   const getToken = useCallback(async () => {
@@ -117,6 +125,41 @@ function Meeting() {
     }
   };
 
+  /* ── Speech Recognition ── */
+  useEffect(() => {
+    if (joined && !showSummarizeView) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onresult = (event) => {
+          let finalTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript + ' ';
+            }
+          }
+          if (finalTranscript) {
+            transcriptRef.current += finalTranscript;
+            setTranscript(transcriptRef.current);
+          }
+        };
+
+        try {
+          recognition.start();
+        } catch (e) { /* ignore already started error */ }
+
+        return () => {
+          try {
+            recognition.stop();
+          } catch (e) { }
+        };
+      }
+    }
+  }, [joined, showSummarizeView]);
+
   /* ── Initialise & join meeting ── */
   useEffect(() => {
     let scriptEl;
@@ -169,7 +212,8 @@ function Meeting() {
       });
 
       meeting.on("meeting-left", () => {
-        navigate("/");
+        // Do not navigate immediately so the post-meeting Summarize View can display.
+        setShowSummarizeView(true);
       });
 
       meeting.on("error", (err) => {
@@ -209,7 +253,36 @@ function Meeting() {
 
   const leaveMeeting = () => {
     meetingRef.current?.leave();
-    navigate("/");
+    setShowSummarizeView(true);
+  };
+
+  /* ── Summarize View Handlers ── */
+  useEffect(() => {
+    if (showSummarizeView && !summaryResult && !isGenerating) {
+      handleGenerateSummary();
+    }
+  }, [showSummarizeView, summaryResult, isGenerating]);
+
+  const handleGenerateSummary = async () => {
+
+    setIsGenerating(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/meeting/generate-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          meetingId: id,
+          transcript: transcriptRef.current
+        })
+      });
+      const data = await res.json();
+      setSummaryResult(data.summary || "Summary generated (empty).");
+    } catch (err) {
+      console.error("Failed to generate summary:", err);
+      setSummaryResult("Failed to generate summary. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyMeetingId = () => {
@@ -217,6 +290,34 @@ function Meeting() {
   };
 
   /* ── Render ── */
+  if (showSummarizeView) {
+    return (
+      <div className="meeting-page">
+        <div className="empty-state" style={{ maxWidth: "800px", padding: "40px" }}>
+          <h2 style={{ marginBottom: "20px" }}>Post-Meeting Summary</h2>
+          {summaryResult ? (
+            <div className="summary-result markdown-content" style={{ textAlign: "left", padding: "20px", background: "white", borderRadius: "8px", color: "#333", whiteSpace: "normal", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", lineHeight: "1.6" }}>
+              <ReactMarkdown>{summaryResult.replace(/\\n/g, '\n')}</ReactMarkdown>
+            </div>
+          ) : (
+            <div>
+              <p style={{ color: "var(--text-secondary)" }}>Generating meeting summary...</p>
+              <div className="spinner" style={{ margin: "20px auto", width: "40px", height: "40px", border: "4px solid rgba(255,255,255,0.1)", borderTop: "4px solid var(--primary-color)", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+              <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+            </div>
+          )}
+
+          <div style={{ marginTop: "40px" }}>
+            <button className="ctrl-btn leave" onClick={() => navigate("/")} style={{ background: "transparent", color: "var(--danger-color)", border: "1px solid var(--danger-color)" }}>
+              Back to Dashboard
+            </button>
+          </div>
+
+        </div>
+      </div >
+    );
+  }
+
   if (error) {
     return (
       <div className="meeting-page">

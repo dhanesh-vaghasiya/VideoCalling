@@ -170,6 +170,13 @@ class Appointment(db.Model):
     time              = db.Column(db.String(10),  nullable=False)    # HH:MM
     mobile            = db.Column(db.String(20))
     status            = db.Column(db.String(20),  nullable=False, default="Pending")  # Pending / Confirmed / Completed / Cancelled
+    
+    # Payment fields
+    transaction_id    = db.Column(db.String(120))
+    payment_status    = db.Column(db.String(20), default="Pending") # Pending / Success / Failed
+
+    meeting_link      = db.Column(db.String(120))
+    meeting_summary   = db.Column(db.Text)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
@@ -189,14 +196,17 @@ class Appointment(db.Model):
             "time":             self.time,
             "mobile":           self.mobile,
             "status":           self.status,
+            "transactionId":    self.transaction_id,
+            "paymentStatus":    self.payment_status,
+            "meetingLink":      self.meeting_link,
             "createdAt":        self.created_at.isoformat() if self.created_at else None,
-            # Joined data for frontend convenience
             "patientName":      pat.full_name if pat else None,
             "patientAge":       pat.age if pat else None,
             "patientGender":    pat.gender if pat else None,
             "relation":         pat.relation if pat else None,
             "doctor":           doc.full_name if doc else None,
             "specialization":   doc.specialization if doc else None,
+            "meetingSummary":   self.meeting_summary,
         }
 
     def __repr__(self):

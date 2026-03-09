@@ -26,12 +26,19 @@ function Dashboard() {
       .catch((err) => console.error("Failed to load doctors:", err));
   }, []);
 
-  // Fetch appointments from backend whenever user is loaded
+  // Fetch appointments from backend whenever user is loaded, and auto-refresh
   useEffect(() => {
     if (!user) return;
-    getAppointments()
-      .then((data) => setAppointments(data))
-      .catch((err) => console.error("Failed to load appointments:", err));
+
+    const fetchAppts = () => {
+      getAppointments()
+        .then((data) => setAppointments(data))
+        .catch((err) => console.error("Failed to load appointments:", err));
+    };
+
+    fetchAppts();
+    const interval = setInterval(fetchAppts, 10000); // Poll every 10 seconds
+    return () => clearInterval(interval);
   }, [user]);
 
   const handleLogout = async () => {

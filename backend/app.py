@@ -29,6 +29,7 @@ def create_app(config_class=Config):
     from routes.patient import patient_bp
     from routes.appointment import appointment_bp
     from routes.doctor import doctor_bp
+    from routes.payment import payment_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(meeting_bp)
@@ -36,6 +37,7 @@ def create_app(config_class=Config):
     app.register_blueprint(patient_bp)
     app.register_blueprint(appointment_bp)
     app.register_blueprint(doctor_bp)
+    app.register_blueprint(payment_bp)
 
     from services.videosdk import create_room, generate_token
     import transcription_bot

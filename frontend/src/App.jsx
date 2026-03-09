@@ -9,6 +9,7 @@ import About from "./pages/About";
 import Doctors from "./pages/Doctors";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import People from "./pages/People";
+import Payment from "./pages/Payment";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/profile" element={<ProtectedRoute requiredRole="user"><Profile /></ProtectedRoute>} />
         <Route path="/about" element={<ProtectedRoute requiredRole="user" ><About /></ProtectedRoute>} />
         <Route path="/doctors" element={<ProtectedRoute requiredRole="user"><Doctors /></ProtectedRoute>} />
+        <Route path="/payment" element={<ProtectedRoute requiredRole="user"><Payment /></ProtectedRoute>} />
 
         {/* ── Doctor-only pages ── */}
         <Route path="/doctor-dashboard" element={<ProtectedRoute requiredRole="doctor"><DoctorDashboard /></ProtectedRoute>} />

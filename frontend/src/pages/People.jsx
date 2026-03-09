@@ -1,13 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { updateAppointmentStatus } from '../services/appointment';
 import './People.css';
 
 const People = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user } = location.state || {}; // Safely access user data
-    const [scheduled, setScheduled] = useState(false);
 
+    // Set initial values from the database object if available
+    const [scheduled, setScheduled] = useState(user?.status === 'Scheduled' || !!user?.meetingLink);
+    const [meetingLink, setMeetingLink] = useState(user?.meetingLink || '');
+    const [countdown, setCountdown] = useState('');
+
+    useEffect(() => {
+        if (!user || (!user.requestDate && !user.date) || (!user.requestTime && !user.time)) return;
+        const reqDate = user.requestDate || user.date;
+        const reqTime = user.requestTime || user.time;
+        // Basic parsing for date & time
+        const targetTime = new Date(`${reqDate} ${reqTime}`).getTime();
+
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = targetTime - now;
+
+            if (distance < 0) {
+                setCountdown("Ready to join!");
+                clearInterval(interval);
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((distance % (1000 * 60)) / 1000);
+                setCountdown(`Starts in: ${days > 0 ? days + 'd ' : ''}${hours}h ${minutes}m ${secs}s`);
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [user]);
     if (!user) {
         return (
             <div className="people-container">
@@ -19,26 +48,21 @@ const People = () => {
         );
     }
 
-    const handleSchedule = () => {
-        // Update in localStorage
-        const allRequests = JSON.parse(localStorage.getItem('hospitalRequests') || '[]');
-        const updatedRequests = allRequests.map(req => {
-            if (req.id === user.id) {
-                return { ...req, status: 'Scheduled' };
-            }
-            return req;
-        });
-        localStorage.setItem('hospitalRequests', JSON.stringify(updatedRequests));
-
-        // Create Meeting ID
-        const meetingId = `MEETING-${Date.now()}`;
-
-        // Simulate API call
-        setTimeout(() => {
+    const handleSchedule = async () => {
+        try {
+            const updatedAppt = await updateAppointmentStatus(user.id, 'Scheduled');
             setScheduled(true);
-            alert(`Meeting Scheduled! ID: ${meetingId}`);
-            // Optionally auto-create meeting link here
-        }, 500);
+            setMeetingLink(updatedAppt.meetingLink);
+            alert(`Meeting Scheduled!`);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to schedule: " + err.message);
+        }
+    };
+
+    const handleJoinMeeting = () => {
+        if (!meetingLink) return;
+        navigate(`/meeting/${meetingLink}`, { state: { name: 'Doctor' } });
     };
 
     return (
@@ -108,7 +132,10 @@ const People = () => {
                 <div className="action-section">
                     {scheduled ? (
                         <div className="confirmation-msg">
-                            ✓ Meeting Scheduled Successfully!
+                            <span style={{ display: 'block', marginBottom: '10px' }}>✓ Meeting Scheduled! {countdown}</span>
+                            <button className="schedule-btn" style={{ backgroundColor: '#28a745' }} onClick={handleJoinMeeting}>
+                                Join Video Call
+                            </button>
                         </div>
                     ) : (
                         <button
@@ -116,7 +143,7 @@ const People = () => {
                             onClick={handleSchedule}
                             disabled={user.status === 'Scheduled'}
                         >
-                            {user.status === 'Scheduled' ? 'Already Scheduled' : 'Schedule Meeting'}
+                            Schedule Meeting
                         </button>
                     )}
                 </div>

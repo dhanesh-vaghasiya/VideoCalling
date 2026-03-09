@@ -11,7 +11,7 @@ import jwt
 from flask import current_app
 
 
-ACCESS_TOKEN_EXPIRES  = timedelta(minutes=15)
+ACCESS_TOKEN_EXPIRES  = timedelta(days=1)
 REFRESH_TOKEN_EXPIRES = timedelta(days=30)
 
 

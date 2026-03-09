@@ -30,10 +30,30 @@ def create_appointment(*, current_user):
     """
     data = request.get_json() or {}
 
-    required = ("patientId", "doctorId", "consultationType", "date", "time")
+    required = ("patientId", "doctorId", "consultationType", "date", "time", "razorpayPaymentId", "razorpayOrderId", "razorpaySignature")
     missing  = [f for f in required if not data.get(f)]
     if missing:
-        return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
+        return jsonify({"error": f"Missing fields: {', '.join(missing)}\nPayment verification details are required."}), 400
+
+    # Verify Razorpay signature (unless simulated for testing)
+    if data.get("razorpaySignature") != "simulated_signature":
+        import os
+        import razorpay
+        
+        if not os.getenv("RAZORPAY_KEY_ID") or not os.getenv("RAZORPAY_KEY_SECRET"):
+            return jsonify({"error": "Payment gateway not configured"}), 500
+            
+        client = razorpay.Client(auth=(os.getenv("RAZORPAY_KEY_ID"), os.getenv("RAZORPAY_KEY_SECRET")))
+        try:
+            client.utility.verify_payment_signature({
+                "razorpay_order_id": data["razorpayOrderId"],
+                "razorpay_payment_id": data["razorpayPaymentId"],
+                "razorpay_signature": data["razorpaySignature"]
+            })
+        except razorpay.errors.SignatureVerificationError:
+            return jsonify({"error": "Payment signature verification failed. Cannot create appointment."}), 400
+        except Exception as e:
+            return jsonify({"error": f"Payment verification error: {str(e)}"}), 500
 
     # Validate patient belongs to user
     patient = Patient.query.filter_by(id=data["patientId"], user_id=current_user.id).first()
@@ -59,7 +79,9 @@ def create_appointment(*, current_user):
         date              = data["date"].strip(),
         time              = data["time"].strip(),
         mobile            = data.get("mobile", "").strip() or None,
-        status            = "Pending",
+        status            = "Confirmed", # Automatically confirm on successful payment
+        transaction_id    = data["razorpayPaymentId"],
+        payment_status    = "Success"
     )
 
     db.session.add(appointment)
@@ -117,7 +139,7 @@ def get_appointment(appointment_id, *, current_user):
 def update_status(appointment_id, *, current_user):
     """Update appointment status.
 
-    Doctors can: Pending → Confirmed, Confirmed → Completed, * → Cancelled
+    Doctors can: Pending → Confirmed, Confirmed → Scheduled/Completed, * → Cancelled
     Users  can: * → Cancelled
     """
     appt = Appointment.query.get(appointment_id)
@@ -132,7 +154,7 @@ def update_status(appointment_id, *, current_user):
 
     data       = request.get_json() or {}
     new_status = data.get("status", "").strip()
-    allowed    = ("Pending", "Confirmed", "Completed", "Cancelled")
+    allowed    = ("Pending", "Confirmed", "Scheduled", "Completed", "Cancelled")
 
     if new_status not in allowed:
         return jsonify({"error": f"Invalid status. Must be one of {allowed}"}), 400
@@ -140,6 +162,13 @@ def update_status(appointment_id, *, current_user):
     # Users can only cancel
     if current_user.role == "user" and new_status != "Cancelled":
         return jsonify({"error": "You can only cancel appointments"}), 403
+
+    if new_status == "Scheduled" and not appt.meeting_link:
+        from services.videosdk import create_room
+        try:
+            appt.meeting_link = create_room()
+        except Exception as e:
+            return jsonify({"error": f"Failed to create video room: {str(e)}"}), 500
 
     appt.status = new_status
     db.session.commit()

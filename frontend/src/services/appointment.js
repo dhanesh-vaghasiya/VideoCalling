@@ -9,7 +9,7 @@ const API_BASE = "http://localhost:5000/api";
 const authHeaders = () => {
   const token = localStorage.getItem("accessToken");
   if (token) {
-    
+
   }
   return {
     "Content-Type": "application/json",
@@ -106,7 +106,7 @@ export const deleteAppointment = (id) =>
  * @param {Object} payload – the full form data from AppointmentModal
  * @returns {{ patient, appointment }}
  */
-export const bookAppointment = async (payload) => {
+export const bookAppointment = async (payload, razorpayDetails = {}) => {
   // 1. Create or find the patient
   const patient = await createPatient({
     fullName: payload.patientName,
@@ -124,6 +124,9 @@ export const bookAppointment = async (payload) => {
     date: payload.date,
     time: payload.time,
     mobile: payload.mobile,
+    razorpayPaymentId: razorpayDetails.razorpayPaymentId,
+    razorpayOrderId: razorpayDetails.razorpayOrderId,
+    razorpaySignature: razorpayDetails.razorpaySignature,
   });
 
   return { patient, appointment };

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { CONSULTATION_TYPES, SYMPTOMS, RELATIONS } from "../constants";
-import { bookAppointment, getPatients } from "../services/appointment";
+import { getPatients } from "../services/appointment";
 
 function AppointmentModal({ user, doctors = [], onClose, onSubmit }) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
 
@@ -100,36 +102,34 @@ function AppointmentModal({ user, doctors = [], onClose, onSubmit }) {
 
     const doctor = doctors.find((d) => d.id === Number(selectedDoctor));
 
-    try {
-      setSubmitting(true);
-      const { appointment } = await bookAppointment({
-        patientName,
-        relation,
-        patientAge: Number(patientAge),
-        patientGender,
-        doctorId: doctor.id,
-        consultationType:
-          CONSULTATION_TYPES.find((c) => c.value === consultationType)?.label || consultationType,
-        symptoms: selectedSymptoms,
-        date: appointmentDate,
-        time: appointmentTime,
-        mobile: mobile.replace(/\D/g, ""),
-      });
+    // Instead of booking instantly, we navigate to the payment page.
+    const appointmentPayload = {
+      patientName,
+      relation,
+      patientAge: Number(patientAge),
+      patientGender,
+      doctorId: doctor.id,
+      consultationType:
+        CONSULTATION_TYPES.find((c) => c.value === consultationType)?.label || consultationType,
+      symptoms: selectedSymptoms,
+      date: appointmentDate,
+      time: appointmentTime,
+      mobile: mobile.replace(/\D/g, ""),
+    };
 
-      // Pass enriched data back so Dashboard can update immediately
-      onSubmit({
-        ...appointment,
-        doctor: doctor.name,
-        specialization: doctor.specialization,
-        fee: doctor.fee,
-        bookedBy: user.fullName,
-        requestedOn: appointment.createdAt,
-      });
-    } catch (err) {
-      alert(err.message || "Failed to book appointment. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+    onClose(); // Close modal
+
+    navigate("/payment", {
+      state: {
+        appointmentPayload,
+        doctorInfo: {
+          name: doctor.name || doctor.fullName,
+          specialization: doctor.specialization,
+          fee: doctor.fee
+        },
+        user
+      }
+    });
   };
 
   return (
@@ -447,7 +447,7 @@ function AppointmentModal({ user, doctors = [], onClose, onSubmit }) {
             )}
             {step === 3 && (
               <button type="submit" className="dash-btn dash-btn-primary" disabled={!otpVerified || submitting}>
-                {submitting ? "Booking…" : "Confirm Appointment"}
+                {submitting ? "Processing…" : "Proceed to Payment"}
               </button>
             )}
           </div>
