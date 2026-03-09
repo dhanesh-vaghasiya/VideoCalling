@@ -1,0 +1,58 @@
+/* Global reset & theme variables */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* ── Nova Hospital teal palette ── */
+  --primary: #5B8FA8;
+  --primary-dark: #3E7289;
+  --primary-darker: #2D5A6E;
+  --primary-light: #E8F3F7;
+  --primary-50: #F0F7FA;
+  --primary-100: #D1E7EF;
+  --primary-200: #A8D0DE;
+  --primary-rgb: 91, 143, 168;
+
+  /* Backgrounds */
+  --bg-page: #EAF0F4;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+
+  /* Text */
+  --text-dark: #1A2D3D;
+  --text-body: #3D5468;
+  --text-muted: #7A92A5;
+
+  /* Borders */
+  --border: #D5DEE5;
+  --border-light: #E8EFF3;
+
+  /* Accents */
+  --success: #2E9E6B;
+  --warning: #D4963A;
+  --danger: #D14E4E;
+  --info: #5B8FA8;
+
+  /* Typography */
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--text-dark);
+  background: var(--bg-page);
+}
+
